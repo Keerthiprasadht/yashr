@@ -1,0 +1,34 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:dind
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Build inside Docker container
+      run: |
+        docker info
+        docker run --rm -v $PWD:/workspace -w /workspace gcc:latest make
+
+    - name: Generate Artifacts
+      run: |
+        mkdir artifacts
+        cp main artifacts/
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: my-artifacts
+        path: artifacts
